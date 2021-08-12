@@ -145,12 +145,16 @@ echo 'Enter openshift version you want to install ACM on (Example: v4.6): '
 read OPENSHIFT_VERSION
 echo 'Enter the registry FQDN: '
 read REGISTRY_FQDN
+echo 'Enter your RedHat account username: '
+read RED_HAT_ACCOUNT_USER
+echo 'Enter your RedHat account password: '
+read RED_HAT_ACCOUNT_PASSWORD
 ```
 3. Login into both source and destination registries.
 ```
 ## Login the both your newly created registry and the redhat.io registry
 podman login ${REGISTRY_FQDN}:5000 -u admin -p redhat
-podman login registry.redhat.io -u {} -p {}
+podman login registry.redhat.io -u ${RED_HAT_ACCOUNT_USER} -p ${RED_HAT_ACCOUNT_PASSWORD}
 echo "Logged into the source registry and the destination registry."
 ```
 4. Use prune to discard the source image from everything except for the advanced-cluster-management.
