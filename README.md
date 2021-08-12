@@ -1,4 +1,4 @@
-# preparing-rhacm-operator-for-disconnected-openshift-cluster
+# rhacm-operator-export
 
 **1.1 Registry Creation**
 **prerequisites - **
