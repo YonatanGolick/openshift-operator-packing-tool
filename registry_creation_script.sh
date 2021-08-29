@@ -1,9 +1,7 @@
+source variables.sh
 ## This is an automated procedure for creating an empty registry to be used for an operator whitening.
 ##create all the necessary directories.
 mkdir /opt/registry
-echo 'Enter the registry FQDN you want to create: '
-read REGISTRY_FQDN
-export REGISTRY_BASE="/opt/registry"
 mkdir -p ${REGISTRY_BASE}/{auth,certs,data,downloads}
 mkdir -p ${REGISTRY_BASE}/downloads/{images,tools,secrets}
 echo "Created a bunch of directories"
