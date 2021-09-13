@@ -42,7 +42,7 @@ echo "Created a Dockerfile and pushed the image to the internal registry."
 cd ${REGISTRY_BASE}/olm/
 oc adm catalog mirror ${REGISTRY_FQDN}:5000/olm/acm-operator-index:$OPENSHIFT_VERSION     ${REGISTRY_FQDN}:5000 -a ${REG_CREDS} --filter-by-os='.*' --manifests-only --insecure
 
-echo "Mirrored the images from the source index.”
+echo "Mirrored the images from the source index."
 ## use skopeo copy to copy the images needed for the operator
 export SOURCE=`echo "select * from related_image where operatorbundle_name like '%advanced-cluster-management.${VERSION}%';" | sqlite3 -line ${REGISTRY_BASE}/acm-index/database/index.db | grep image | awk '{print $3}'`
 echo "Choose only the images relevant to the version you chose at the beginning of the process."
