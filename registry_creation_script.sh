@@ -21,15 +21,28 @@ echo " [req]
 default_bits = 4096
 prompt = no
 default_md = sha256
+x509_extensions = req_ext
+req_extensions = req_ext
 distinguished_name = dn
+
 [ dn ]
-C=IL
-ST=TLV
-L=TLV
-O=Org
-OU=OU
-emailAddress=local@local.com
-CN = ${REGISTRY_FQDN}" > ${REGISTRY_BASE}/certs/answerFile.txt
+C=US
+ST=New York
+L=New York
+O=MyOrg
+OU=MyOU
+emailAddress=me@working.me
+CN=${REGISTRY_FQDN}
+
+[ req_ext ]
+subjectAltName = @alt_names
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints = critical, CA:true
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign
+
+[ alt_names ]
+DNS.1 = ${REGISTRY_FQDN}" > ${REGISTRY_BASE}/certs/answerFile.txt
 openssl req -newkey rsa:4096 -nodes -sha256 -keyout domain.key -x509 -days 365 -out domain.crt -config <( cat ${REGISTRY_BASE}/certs/answerFile.txt )
 echo "Created a domain.crt for the registry to have a certificate."
 cp ${REGISTRY_BASE}/certs/domain.crt /etc/pki/ca-trust/source/anchors/
