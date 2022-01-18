@@ -1,6 +1,6 @@
 #!/bin/bash
 #create the necessary directories
-#reg_creds=/run/containers/0/auth.json
+reg_creds=/run/containers/0/auth.json
 #export registry_base="/opt/$name-$version"
 #"/opt/acm-2.4.1-registry" ====> old value
 mkdir ${registry_base}/$name-$operator-index
@@ -35,21 +35,21 @@ echo "Logged into the source registry and the destination registry."
 
 opm index prune -f registry.redhat.io/redhat/community-operator-index:$version -p $name -t ${registry}:5000/olm/$name-index:$version --generate
 
-echo "Pruned the source image from everything except for the advanced-cluster-management."
+echo "Pruned the source image from everything except for the ${name}."
 
 ## Create a Dockerfile and push the image to your registry
-podman build --format docker -f index.Dockerfile -t ${registry}:5000/olm/acm-operator-index:$version
-podman push ${registry}:5000/olm/acm-operator-index:$version
+podman build --format docker -f index.Dockerfile -t ${registry}:5000/olm/$name-index:$version
+podman push ${registry}:5000/olm/$name-index:$version
 echo "Created a Dockerfile and pushed the image to the internal registry."
 
 ## Mirror the images from the index
 cd ${registry_base}/olm/
-pwd
-oc adm catalog mirror ${registry}:5000/olm/$name-index:$version     ${registry}:5000 -a ${reg_creds} --filter-by-os='.*' --manifests-only --insecure
+oc adm catalog mirror ${registry}:5000/olm/$name-index:$version     ${registry}:5000 -a ${reg_creds} --index-filter-by-os='.*' --manifests-only --insecure
 
 echo "Mirrored the images from the source index."
 ## use skopeo copy to copy the images needed for the operator
-source=`echo "select * from related_image where operatorbundle_name like '%${name}.${operator}%';" | sqlite3 -line ${registry_base}/${name}-index/database/index.db | grep image | awk '{print $3}'`
+
+source=`echo "select * from related_image where operatorbundle_name like '%${name}.${operator}%';" | sqlite3 -line ${registry_base}/${name}-${operator}-index/database/index.db | grep image | awk '{print $3}'`
 echo "Choose only the images relevant to the version you chose at the beginning of the process."
 
 for image in $source;do
