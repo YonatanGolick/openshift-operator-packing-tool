@@ -29,4 +29,4 @@ check_missing_params
 registry_base="/opt/$name-$version"
 . ./registry-creation-script.sh
 
-. /home/cloudlet/operator-packing-improvements/operator-packing-script.sh
+. ./operator-packing-script.sh
