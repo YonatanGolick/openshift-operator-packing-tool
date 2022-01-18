@@ -27,6 +27,6 @@ done
 
 check_missing_params
 registry_base="/opt/$name-$version"
-. ./registry-creation-script.sh
+. ./registry_creation_script.sh
 
-. ./operator-packing-script.sh
+. /home/cloudlet/rhacm-operator-export/operator_packing_script.sh

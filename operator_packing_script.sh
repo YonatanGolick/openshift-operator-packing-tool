@@ -1,3 +1,4 @@
+#!/bin/bash
 #create the necessary directories
 #reg_creds=/run/containers/0/auth.json
 #export registry_base="/opt/$name-$version"
@@ -43,11 +44,12 @@ echo "Created a Dockerfile and pushed the image to the internal registry."
 
 ## Mirror the images from the index
 cd ${registry_base}/olm/
+pwd
 oc adm catalog mirror ${registry}:5000/olm/$name-index:$version     ${registry}:5000 -a ${reg_creds} --filter-by-os='.*' --manifests-only --insecure
-exit 1
+
 echo "Mirrored the images from the source index."
 ## use skopeo copy to copy the images needed for the operator
-source=`echo "select * from related_image where operatorbundle_name like '%${name}.${operator}%';" | sqlite3 -line ${registry_base}/{name}-index/database/index.db | grep image | awk '{print $3}'`
+source=`echo "select * from related_image where operatorbundle_name like '%${name}.${operator}%';" | sqlite3 -line ${registry_base}/${name}-index/database/index.db | grep image | awk '{print $3}'`
 echo "Choose only the images relevant to the version you chose at the beginning of the process."
 
 for image in $source;do
