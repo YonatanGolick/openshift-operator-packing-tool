@@ -1,30 +1,10 @@
 #!/bin/bash
 #create the necessary directories
 reg_creds=/run/containers/0/auth.json
-#export registry_base="/opt/$name-$version"
-#"/opt/acm-2.4.1-registry" ====> old value
 mkdir ${registry_base}/$name-$operator-index
 mkdir ${registry_base}/olm
 cd ${registry_base}/$name-$operator-index
 echo "Created necessary directories."
-
-# echo 'Enter your RedHat account username: '
-# read user
-
-# echo 'Enter your RedHat account password: '
-# read password
-
-## Choose the operator version you want to copy
-
-# echo 'Enter the ACM version you want (Example: v2.2.5): '
-# read operator
-
-# echo 'Enter openshift version you want to install ACM on (Example: v4.6): '
-# read version
-
-# echo 'Enter the registry FQDN: '
-# read registry
-
 
 ## Login the both your newly created registry and the redhat.io registry
 

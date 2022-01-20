@@ -1,7 +1,7 @@
 #!/bin/bash
 print_help_message(){
     echo "Usage:
- bash-with-flags.sh -v [Openshift Version] -o [Operator Version] -r [Registry FQDN] -u [RedHat Account User] -p [Password] -n [Package Name]"
+ operator_pack.sh -v [Openshift Version] -o [Operator Version] -r [Registry FQDN] -u [RedHat Account User] -p [Password] -n [Package Name]"
 }
 check_missing_params(){
   [ -z $version ] && echo "Missing Openshift version" && print_help_message && exit 1
@@ -24,9 +24,17 @@ while getopts ":v:o:r:u:p:n:" flag; do
     *)echo "No argument was given!" >&2 ;;
   esac
 done
-
 check_missing_params
-registry_base="/opt/$name-$version"
-. ./registry_creation_script.sh
+work_dir=$(pwd)
+echo "Choose your base directory: "
+read registry_base
+registry_base_default="/opt/$name-$version"
+if [ -z "$registry_base" ]; then
+    registry_base=$registry_base_default
+else
+    registry_base=$registry_base/$name-$version
+fi
+echo $registry_base
+. $work_dir/registry_creation_script.sh
 
-. /home/cloudlet/rhacm-operator-export/operator_packing_script.sh
+. $work_dir/operator_packing_script.sh

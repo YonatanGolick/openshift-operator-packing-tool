@@ -1,9 +1,4 @@
 #!/bin/bash
-#mkdir /opt/acm-2.3.2-registry
-#echo 'Enter the registry FQDN you want to create: '
-#read registry
-
-#registry_base="/opt/$name-$version"
 
 mkdir -p ${registry_base}/{auth,certs,data,downloads}
 mkdir -p ${registry_base}/downloads/{images,tools,secrets}
@@ -60,13 +55,11 @@ echo 'podman run --name registry --rm -d -p 5000:5000 \
 	-e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
 docker.io/library/registry:2' > ${registry_base}/downloads/tools/start_registry.sh
 chmod a+x ${registry_base}/downloads/tools/start_registry.sh
-source ${registry_base}/downloads/tools/start_registry.sh
-#${registry_base}/downloads/tools/start_registry.sh
+. ${registry_base}/downloads/tools/start_registry.sh
+
 sleep 5
 echo ''
 curl -u admin:redhat -k https://$registry:5000/v2/_catalog
 echo ''
 echo ''
 echo 'The script needs to return {"repositories":[]}, if it did everything worked.'
-
-#source /home/cloudlet/operator-packing-improvements/operator-packing-script.sh
