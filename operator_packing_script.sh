@@ -13,7 +13,7 @@ podman login registry.redhat.io -u ${user} -p ${password}
 echo "Logged into the source registry and the destination registry."
 ## prune the source index
 
-opm index prune -f registry.redhat.io/redhat/community-operator-index:$version -p $name -t ${registry}:5000/olm/$name-index:$version --generate
+opm index prune -f registry.redhat.io/redhat/$index:$version -p $name -t ${registry}:5000/olm/$name-index:$version --generate
 
 echo "Pruned the source image from everything except for the ${name}."
 
