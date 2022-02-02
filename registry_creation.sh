@@ -2,12 +2,15 @@
 
 mkdir -p ${registry_base}/{auth,certs,data,downloads}
 mkdir -p ${registry_base}/downloads/{images,tools,secrets}
+
 ## Add the registry FQDN to /etc/hosts
 echo "127.0.0.1      ${registry}" >> /etc/hosts
+
 ## Install necessary dependencies.
 yum install -y jq openssl podman  curl wget skopeo
 yum install -y  nmap telnet openldap-clients tcpdump
 yum install -y net-tools httpd-tools podman sqlite
+
 ## Create a self-singed certificate for the registry
 cd ${registry_base}/certs/
 
@@ -34,15 +37,19 @@ basicConstraints = critical, CA:true
 keyUsage = critical, digitalSignature, cRLSign, keyCertSign
 [ alt_names ]
 DNS.1 = ${registry}" > ${registry_base}/certs/answerFile.txt 
+
 openssl req -newkey rsa:4096 -nodes -sha256 -keyout domain.key -x509 -days 365 -out domain.crt -config <( cat ${registry_base}/certs/answerFile.txt )
 cp ${registry_base}/certs/domain.crt /etc/pki/ca-trust/source/anchors/
 update-ca-trust extract
+
 ## Create username and password to authenticate with the registry
-htpasswd -bBc ${registry_base}/auth/htpasswd admin redhat 
+htpasswd -bBc ${registry_base}/auth/htpasswd admin redhat
+
 ## Open the used port to allow pulling from the registry
 systemctl start firewalld
 firewall-cmd --add-port=5000/tcp --zone=public --permanent
 firewall-cmd --reload
+
 ## Create the registry
 echo 'podman run --name registry --rm -d -p 5000:5000 \
 	-v ${registry_base}/data:/var/lib/registry:z \
