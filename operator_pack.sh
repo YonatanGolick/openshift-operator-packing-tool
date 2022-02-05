@@ -21,11 +21,11 @@ check_missing_params() {
   [ -z $index ] && echo  "Missing index name" && print_help_message && exit 1
 }
 is_registry_base_null() {
-  registry_base_default="/opt/$name-$version"
+  registry_base_default="/opt/$name-$operator-$version"
   if [ -z "$registry_base" ]; then
       registry_base=$registry_base_default
   else
-      registry_base=$registry_base/$name-$version
+      registry_base=$registry_base/$name-$operator-$version
   fi
 }
 is_index_valid() {
