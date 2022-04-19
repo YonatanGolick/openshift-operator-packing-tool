@@ -34,7 +34,7 @@ echo "Choose only the images relevant to the version you chose at the beginning 
 
 
 image_mapping=$(find . -iname "mapping.txt")
-all_images=$(cat $image_mapping | grep -v $registry:5000)
+all_images=$(cat $image_mapping | grep -v $registry:5000 | awk -F \= '{print $1}')
 source_registries=$(printf '%s' "$all_images" | awk -F \/ '{print $1}' | sort | uniq)
 #local_source=$source
 for src in $source_registries;do
@@ -54,6 +54,7 @@ for image in $all_images;do
 
 #    image_namespace=$(echo $image | awk -F \/ '{print $2}')
     local_source=$(printf '%s' "$image" | sed "s/$remote_registry/$registry:5000/g")
+
 #    echo docker://$image docker://$local_source
     skopeo copy -a --dest-tls-verify=false docker://$image docker://$local_source
     echo docker://$local_source >> images.txt
