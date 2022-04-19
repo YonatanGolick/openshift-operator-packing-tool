@@ -29,17 +29,15 @@ oc adm catalog mirror $registry:5000/olm/$name-index:$version     $registry:5000
 echo "Mirrored the images from the source index."
 
 ## use skopeo copy to copy the images needed for the operator
-source=`echo "select * from related_image where operatorbundle_name like '%$name.$operator%';" | sqlite3 -line $registry_base/$name-$operator-$version-index/database/index.db | grep image | awk '{print $3}'`
+
+# Might deprecate - not needed as of now it seems
+#source=`echo "select * from related_image where operatorbundle_name like '%$name.$operator%';" | sqlite3 -line $registry_base/$name-$operator-$version-index/database/index.db | grep image | awk '{print $3}'`
 echo "Choose only the images relevant to the version you chose at the beginning of the process."
-
-
 image_mapping=$(find . -iname "mapping.txt")
 all_images=$(cat $image_mapping | grep -v $registry:5000 | awk -F \= '{print $1}')
 source_registries=$(printf '%s' "$all_images" | awk -F \/ '{print $1}' | sort | uniq)
-#local_source=$source
+
 for src in $source_registries;do
-#    local_source=$(printf '%s' "$local_source" | sed "s/$src/$registry/g")
-#    echo "$local_source"
     if [[ $src != *"redhat"* ]]; then
         continue
     fi
@@ -49,13 +47,8 @@ done
 for image in $all_images;do
     # Save the destination location, including registry and right digest
     # Push the image to your disconnected registry
-#    image_name=$(echo $image | awk -F \/ '{print $3}')
     remote_registry=$(echo $image | awk -F \/ '{print $1}')
-
-#    image_namespace=$(echo $image | awk -F \/ '{print $2}')
     local_source=$(printf '%s' "$image" | sed "s/$remote_registry/$registry:5000/g")
-
-#    echo docker://$image docker://$local_source
     skopeo copy -a --dest-tls-verify=false docker://$image docker://$local_source
     echo docker://$local_source >> images.txt
 done
