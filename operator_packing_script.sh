@@ -31,11 +31,11 @@ echo "Mirrored the images from the source index."
 ## use skopeo copy to copy the images needed for the operator
 
 # Might deprecate - not needed as of now it seems
-#source=`echo "select * from related_image where operatorbundle_name like '%$name.$operator%';" | sqlite3 -line $registry_base/$name-$operator-$version-index/database/index.db | grep image | awk '{print $3}'`
+source=`echo "select * from related_image where operatorbundle_name like '%.$operator%';" | sqlite3 -line $registry_base/$name-$operator-$version-index/database/index.db | grep image | awk '{print $3}'`
 echo "Choose only the images relevant to the version you chose at the beginning of the process."
-image_mapping=$(find . -iname "mapping.txt")
-all_images=$(cat $image_mapping | grep -v $registry:5000 | awk -F \= '{print $1}')
-source_registries=$(printf '%s' "$all_images" | awk -F \/ '{print $1}' | sort | uniq)
+#image_mapping=$(find . -iname "mapping.txt")
+#all_images=$(cat $image_mapping | grep -v $registry:5000 | awk -F \= '{print $1}')
+source_registries=$(printf '%s' "$source" | awk -F \/ '{print $1}' | sort | uniq)
 
 for src in $source_registries;do
     if [[ $src != *"redhat"* ]]; then
@@ -44,7 +44,7 @@ for src in $source_registries;do
     skopeo login $src -u $user -p $password
 done
 
-for image in $all_images;do
+for image in $source;do
     # Save the destination location, including registry and right digest
     # Push the image to your disconnected registry
     remote_registry=$(echo $image | awk -F \/ '{print $1}')
