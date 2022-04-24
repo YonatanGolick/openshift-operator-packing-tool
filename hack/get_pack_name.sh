@@ -37,6 +37,9 @@ grpcurl_exists() {
       tar -xvzf grpcurl_1.8.5_linux_x86_64.tar.gz -C /usr/bin/.
     fi
 }
+list_packages() {
+        grpcurl -plaintext localhost:50051 api.Registry/ListPackages
+}
 while getopts ":v:u:p:i:" flag; do
   case $flag in
     v)version=$OPTARG >&2;;
@@ -57,7 +60,12 @@ grpcurl_exists
 container_id=$(podman run -p50051:50051 -dit registry.redhat.io/redhat/$index:$version >&1)
 
 echo -e "Printing package names for $index-$version\n\n---------------------------------------------"
-grpcurl -plaintext localhost:50051 api.Registry/ListPackages
+while ! list_packages >/dev/null 2>&1
+do
+        echo "Index container Not ready yet..."
+        sleep 3
+done
+list_packages
 echo -e "---------------------------------------------\n\n"
 
 echo -e "Cleaning up the created container...\n\n"
