@@ -29,16 +29,28 @@ oc adm catalog mirror $registry:5000/olm/$name-index:$version     $registry:5000
 echo "Mirrored the images from the source index."
 
 ## use skopeo copy to copy the images needed for the operator
-source=`echo "select * from related_image where operatorbundle_name like '%$name.$operator%';" | sqlite3 -line $registry_base/$name-$operator-$version-index/database/index.db | grep image | awk '{print $3}'`
+
+# Might deprecate - not needed as of now it seems
+source=`echo "select * from related_image where operatorbundle_name like '%.$operator%';" | sqlite3 -line $registry_base/$name-$operator-$version-index/database/index.db | grep image | awk '{print $3}'`
 echo "Choose only the images relevant to the version you chose at the beginning of the process."
+#image_mapping=$(find . -iname "mapping.txt")
+#all_images=$(cat $image_mapping | grep -v $registry:5000 | awk -F \= '{print $1}')
+source_registries=$(printf '%s' "$source" | awk -F \/ '{print $1}' | sort | uniq)
+
+for src in $source_registries;do
+    if [[ $src != *"redhat"* ]]; then
+        continue
+    fi
+    skopeo login $src -u $user -p $password
+done
 
 for image in $source;do
     # Save the destination location, including registry and right digest
     # Push the image to your disconnected registry
-    image_name=$(echo $image | awk -F \/ '{print $3}')
-    image_namespace=$(echo $image | awk -F \/ '{print $2}')
-    skopeo copy -a --dest-tls-verify=false docker://$image docker://$registry:5000/$image_namespace/$image_name
-    echo docker://$registry:5000/$image_namespace/$image_name >> images.txt
+    remote_registry=$(echo $image | awk -F \/ '{print $1}')
+    local_source=$(printf '%s' "$image" | sed "s/$remote_registry/$registry:5000/g")
+    skopeo copy -a --dest-tls-verify=false docker://$image docker://$local_source
+    echo docker://$local_source >> images.txt
 done
 
 echo "Skopeo copy the images from the chosen version into the internal registry."
