@@ -1,4 +1,4 @@
-# rhacm-operator-export
+# openshift-operator-packing-tool
 
 **Prerequisites:**
 
